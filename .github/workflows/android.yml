@@ -46,6 +46,5 @@ jobs:
         target: google_apis
         arch: x86_64
         profile: pixel_5
-        emulator-build: 30.0.5 
         disable-animations: true
         script: ./gradlew connectedCheck
