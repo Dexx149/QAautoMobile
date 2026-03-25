@@ -104,43 +104,115 @@ class ChangeTextTest {
         val packageName = MODEL_PACKAGE
         waitForPackage(packageName)
 
-        device.findObject(By.res(packageName, "userInput")).text = textToSet
-        device.findObject(By.res(packageName, "buttonChange")).click()
+        // Явное ожидание элемента userInput
+        val userInputElement = device.wait(
+            Until.findObject(By.res(packageName, "userInput")),
+            5000
+        )
+        assertNotNull("Element userInput not found", userInputElement)
+        userInputElement.text = textToSet
 
-        val result = device.findObject(By.res(packageName, "textToBeChanged")).text
+        // Явное ожидание элемента buttonChange
+        val buttonChangeElement = device.wait(
+            Until.findObject(By.res(packageName, "buttonChange")),
+            5000
+        )
+        assertNotNull("Element buttonChange not found", buttonChangeElement)
+        buttonChangeElement.click()
+
+        // Ожидание обновления UI
+        device.waitForIdle()
+
+        // Явное ожидание элемента textToBeChanged после клика
+        val resultElement = device.wait(
+            Until.findObject(By.res(packageName, "textToBeChanged")),
+            5000
+        )
+        assertNotNull("Element textToBeChanged not found after click", resultElement)
+
+        val result = resultElement.text
         assertEquals(result, textToSet)
     }
 
-        @Test
+    @Test
     fun testEmptyString() {
         val packageName = MODEL_PACKAGE
         waitForPackage(packageName)
 
-        val originalText = device.findObject(By.res(packageName, "textToBeChanged")).text
+        // Явное ожидание элемента textToBeChanged для получения originalText
+        val textToBeChangedElement = device.wait(
+            Until.findObject(By.res(packageName, "textToBeChanged")),
+            5000
+        )
+        assertNotNull("Element textToBeChanged not found", textToBeChangedElement)
+        val originalText = textToBeChangedElement.text
 
         val emptyText = ""
-        device.findObject(By.res(packageName, "userInput")).text = emptyText
-        device.findObject(By.res(packageName, "buttonChange")).click()
 
-        val resultText = device.findObject(By.res(packageName, "textToBeChanged")).text
-        assertEquals( originalText, resultText)
+        // Явное ожидание элемента userInput
+        val userInputElement = device.wait(
+            Until.findObject(By.res(packageName, "userInput")),
+            5000
+        )
+        assertNotNull("Element userInput not found", userInputElement)
+        userInputElement.text = emptyText
+
+        // Явное ожидание элемента buttonChange
+        val buttonChangeElement = device.wait(
+            Until.findObject(By.res(packageName, "buttonChange")),
+            5000
+        )
+        assertNotNull("Element buttonChange not found", buttonChangeElement)
+        buttonChangeElement.click()
+
+        // Ожидание обновления UI
+        device.waitForIdle()
+
+        // Явное ожидание элемента textToBeChanged после клика
+        val resultElement = device.wait(
+            Until.findObject(By.res(packageName, "textToBeChanged")),
+            5000
+        )
+        assertNotNull("Element textToBeChanged not found after click", resultElement)
+        val resultText = resultElement.text
+
+        assertEquals(originalText, resultText)
     }
+
     @Test
     fun testOpenInNewActivity() {
         val packageName = MODEL_PACKAGE
         waitForPackage(packageName)
 
         val testText = "Тестовый текст для новой Activity"
-        device.findObject(By.res(packageName, "userInput")).text = testText
 
-        device.findObject(By.res(packageName, "buttonActivity")).click()
+        // Явное ожидание элемента userInput
+        val userInputElement = device.wait(
+            Until.findObject(By.res(packageName, "userInput")),
+            5000
+        )
+        assertNotNull("Element userInput not found", userInputElement)
+        userInputElement.text = testText
 
+        // Явное ожидание элемента buttonActivity
+        val buttonActivityElement = device.wait(
+            Until.findObject(By.res(packageName, "buttonActivity")),
+            5000
+        )
+        assertNotNull("Element buttonActivity not found", buttonActivityElement)
+        buttonActivityElement.click()
+
+        // Ожидание появления новой Activity
         device.waitForIdle()
-        Thread.sleep(500)
 
-        val newActivityText = device.findObject(By.text(testText))
+        // Явное ожидание появления текста в новой Activity
+        val newActivityTextElement = device.wait(
+            Until.findObject(By.text(testText)),
+            5000
+        )
+        assertNotNull("Text '$testText' not found in new Activity", newActivityTextElement)
 
-        assertEquals( testText, newActivityText.text)
+        assertEquals(testText, newActivityTextElement.text)
     }
 
 }
